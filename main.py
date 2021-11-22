@@ -3,7 +3,7 @@ import logging
 import time
 from flask import Flask
 from flask import jsonify
-from core.scraper import best_buy
+from core.hunter import best_buy
 from core.timer import RepeatedTimer
 from core.notify import notify
 import os
@@ -52,7 +52,7 @@ def index():
 
 # this is no longer used because i deployed to GCP Cloud Run which does not handle long running jobs.
 def hunt_forever():
-    notify('beginning hunt loop')
+    notify('hunting forever...')
     # run our scrapers on a repeated loop
     # RepeatedTimer(15, best_buy)
     tick = 0
@@ -81,8 +81,6 @@ def check_all():
 
 
 if __name__ == '__main__':
-    notify('started ps5hunter')
+    notify('ps5hunter started')
     hunt_forever()
-
     # app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
-

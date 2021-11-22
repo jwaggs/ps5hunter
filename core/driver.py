@@ -7,7 +7,7 @@ import logging
 selenium_url = None
 if os.environ.get('SELENIUM_URL') is not None:
     selenium_url = os.environ.get('SELENIUM_URL')  # required env
-    logging.info('selenium url:', selenium_url)
+    logging.info(f'selenium url: {selenium_url}')
 else:
     raise Exception('No remote Selenium webdriver provided in the environment.')
 

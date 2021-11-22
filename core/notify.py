@@ -16,7 +16,7 @@ assert number_to is not None
 def notify(message: str):
     client = Client(account_sid, auth_token)
     message = client.messages.create(to=number_to, from_=number_from, body=message)
-    logging.info('message sent', message.sid)
+    logging.info(f'sent message: {message} sid: {message.sid}')
 
 
 def notify_in_stock(name: str):

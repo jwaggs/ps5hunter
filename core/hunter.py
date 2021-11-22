@@ -14,7 +14,7 @@ def best_buy():
     """
     checks best buy site for ps5 inventory
     """
-    notify('checking best buy inventory...')
+    logging.info('sniffing out best buy...')
     global count_err
     rsp = 'Unknown Inventory Status'  # default response if anything goes wrong
     driver = new_remote_driver()
@@ -41,8 +41,7 @@ def best_buy():
             notify_of_error(err_message)
     finally:
         driver.quit()
-    logging.debug(f'Best Buy: {rsp}')
-    notify(rsp)
+    logging.info(f'Best Buy: {rsp}')
     return rsp
 
 
