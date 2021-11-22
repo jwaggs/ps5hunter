@@ -6,9 +6,9 @@ This is a quick and dirty bot to hunt down a ps5 - not professional work.
 
 # Commands to get going
 
-`docker build -t jwaggs/ps5hunter:latest .`
+`docker build -t us.gcr.io/ps5hunter/hunter:latest .`
 
-`docker run --env TWILIO_ACCOUNT_SID --env TWILIO_AUTH_TOKEN --env TWILIO_PHONE_NUM --env SMS_NOTIFY_NUM jwaggs/ps5hunter:latest`
+`docker run --env TWILIO_ACCOUNT_SID --env TWILIO_AUTH_TOKEN --env TWILIO_PHONE_NUM --env SMS_NOTIFY_NUM us.gcr.io/ps5hunter/hunter:latest`
 
 
 ### Option 1 Google Cloud Run

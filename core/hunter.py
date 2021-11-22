@@ -4,7 +4,7 @@ from core.driver import new_driver
 from core.notify import notify_in_stock, notify_of_error, notify
 
 
-default_response = 'Unknown Inventory Status'
+default_response = 'UNKNOWN'
 
 
 def retry_or_notify(retries=2):
@@ -51,7 +51,7 @@ def best_buy():
         #     rsp = 'Limited AVAILABILITY!'
         #     notify_in_stock('Best Buy')
         else:
-            rsp = 'In Stock'
+            rsp = 'IN STOCK'
             notify_in_stock(f'best buy {url}')
 
     print(f'Best Buy: {rsp}')
@@ -63,6 +63,18 @@ def best_buy():
 def target():
     logging.info('sniffing out target...')
     rsp = default_response
+    with new_driver() as driver:
+        url = 'https://www.target.com/c/playstation-5-video-games/-/N-hj96d'
+        xpath = '/html/body/div[1]/div/div[4]/div[4]/div/div/div[2]/p'
+        driver.get(url)
+        banner = driver.find_element(By.XPATH, xpath)
+        if banner.text == 'Consoles will be viewable when inventory is available.':
+            rsp = 'Sold Out'
+        else:
+            rsp = 'IN STOCK'
+            notify_in_stock(f'target {url}')
+    print(f'Target: {rsp}')
+    logging.info(f'Target: {rsp}')
     return rsp
 
 
@@ -70,9 +82,16 @@ def target():
 def walmart():
     logging.info('sniffing out walmart...')
     rsp = default_response
+    with new_driver() as driver:
+        url = 'https://www.walmart.com/ip/Sony-PlayStation-5-Video-Game-Console/165545420'
+        driver.get(url)
+        print('PAGE SOURCE', driver.page_source)
+        if "Early access coming soon!" in driver.page_source:
+            print('FOUND MY STRING')
+            rsp = 'Sold Out'
+        else:
+            rsp = 'IN STOCK'
+            notify_in_stock(f'walmart {url}')
+    print(f'Walmart: {rsp}')
+    logging.info(f'Walmart: {rsp}')
     return rsp
-    # with new_driver() as driver:
-    #     url = 'https://www.walmart.com/ip/Sony-PlayStation-5-Video-Game-Console/165545420'
-    #     driver.get(url)
-    #
-    # return rsp

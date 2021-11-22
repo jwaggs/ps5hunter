@@ -6,19 +6,8 @@ from flask import jsonify
 from core.hunter import best_buy, target, walmart
 from core.timer import RepeatedTimer
 from core.notify import notify
-import os
-from threading import Thread
-# Imports the Cloud Logging client library
-import google.cloud.logging
+import core.logger
 
-
-# Retrieves a Cloud Logging handler based on the environment
-# you're running in and integrates the handler with the
-# Python logging module. By default this captures all logs
-# at INFO level and higher
-# TODO: reimplement cloud logging
-# client = google.cloud.logging.Client()
-# client.setup_logging()
 
 app = Flask(__name__)
 
@@ -62,10 +51,15 @@ def hunt_forever():
 
 def check_all():
     response = {}  # json dict of store statuses
+    # response['Walmart'] = walmart()  # damnit - walmart has recaptcha blocking me
     response['Best Buy'] = best_buy()
     response['Target'] = target()
-    response['Walmart'] = walmart()
     logging.info(f'checked all stores: {response}')
+
+    # TODO: remove pprint & notify here. only log each loop.
+    # from pprint import pprint
+    # pprint(response)
+    # notify(f'statuses:\n\n{response}')
     return response
 
 
