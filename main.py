@@ -3,7 +3,7 @@ import logging
 import time
 from flask import Flask
 from flask import jsonify
-from core.hunter import best_buy
+from core.hunter import best_buy, target, walmart
 from core.timer import RepeatedTimer
 from core.notify import notify
 import os
@@ -11,14 +11,14 @@ from threading import Thread
 # Imports the Cloud Logging client library
 import google.cloud.logging
 
-# Instantiates a client
-client = google.cloud.logging.Client()
 
 # Retrieves a Cloud Logging handler based on the environment
 # you're running in and integrates the handler with the
 # Python logging module. By default this captures all logs
 # at INFO level and higher
-client.setup_logging()
+# TODO: reimplement cloud logging
+# client = google.cloud.logging.Client()
+# client.setup_logging()
 
 app = Flask(__name__)
 
@@ -31,23 +31,8 @@ def index():
     the only route - hunts all tracked sites for inventory
     :return: json dict of statuses
     """
-    bb = best_buy()
-    response = {
-        'best buy': bb,
-    }
+    response = check_all()
     return response
-
-
-# def delete_me_infinite_text_loop():
-#     tick = 0
-#     while True:
-#         if tick % 5 == 0:
-#             notify('delete_me_infinite_text_loop!!!')
-#         print(f'tick {tick}')
-#         time.sleep(2)
-#         print(f'boom!')
-#         time.sleep(1)
-#         tick += 1
 
 
 # this is no longer used because i deployed to GCP Cloud Run which does not handle long running jobs.
@@ -76,8 +61,24 @@ def hunt_forever():
 
 
 def check_all():
-    best_buy()
-    # TODO add other checks here.
+    response = {}  # json dict of store statuses
+    response['Best Buy'] = best_buy()
+    response['Target'] = target()
+    response['Walmart'] = walmart()
+    logging.info(f'checked all stores: {response}')
+    return response
+
+
+# def delete_me_infinite_text_loop():
+#     tick = 0
+#     while True:
+#         if tick % 5 == 0:
+#             notify('delete_me_infinite_text_loop!!!')
+#         print(f'tick {tick}')
+#         time.sleep(2)
+#         print(f'boom!')
+#         time.sleep(1)
+#         tick += 1
 
 
 if __name__ == '__main__':

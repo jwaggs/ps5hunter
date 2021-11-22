@@ -1,24 +1,45 @@
 import logging
-
 from selenium.webdriver.common.by import By
-
-from core.driver import new_remote_driver
+from core.driver import new_driver
 from core.notify import notify_in_stock, notify_of_error, notify
-from core.timer import timeout
-
-count_err = 0  # used to track sequential errors to suppress notifications
 
 
-# @timeout(60)  # timeout not allowed on background thread since it uses signal
+default_response = 'Unknown Inventory Status'
+
+
+def retry_or_notify(retries=2):
+    """
+    used to wrap a function and retry it n number of times, or notify_of_error once all retries are exhausted
+    """
+    def decorator(f):
+        def inner(*args, **kwargs):
+            status = {
+                'retries': retries,  # num allowed retries
+                'errors': 0,  # if error count == num of allowed retries, we notify
+            }
+            while status['retries'] >= 0:
+                try:
+                    return f(*args, **kwargs)
+                except Exception as e:
+                    logging.error(f'caught error in retry decorator: {e} retries-remaining: {status["retries"]}')
+                    status['retries'] -= 1
+                    status['errors'] += 1
+            num_err = status['errors']
+            notify_of_error(f'retried {retries} times, errored {num_err} times')
+            # return 'Status Unknown - All Retries Exhausted'
+            # raise Exception("retried {} times".format(retries))
+        return inner
+    return decorator
+
+
+@retry_or_notify(retries=2)
 def best_buy():
     """
     checks best buy site for ps5 inventory
     """
     logging.info('sniffing out best buy...')
-    global count_err
     rsp = 'Unknown Inventory Status'  # default response if anything goes wrong
-    driver = new_remote_driver()
-    try:
+    with new_driver() as driver:
         url = 'https://www.bestbuy.com/site/sony-playstation-5-console/6426149.p?skuId=6426149'
         driver.get(url)
         buy_button = driver.find_element(By.CSS_SELECTOR, 'button.add-to-cart-button')
@@ -32,18 +53,26 @@ def best_buy():
         else:
             rsp = 'In Stock'
             notify_in_stock(f'best buy {url}')
-        count_err = 0
-    except Exception as e:
-        count_err += 1
-        err_message = f'caught error {e}'
-        logging.error(err_message)
-        if count_err > 1:
-            notify_of_error(err_message)
-    finally:
-        driver.quit()
+
+    print(f'Best Buy: {rsp}')
     logging.info(f'Best Buy: {rsp}')
     return rsp
 
 
+@retry_or_notify(retries=2)
 def target():
-    pass
+    logging.info('sniffing out target...')
+    rsp = default_response
+    return rsp
+
+
+@retry_or_notify(retries=2)
+def walmart():
+    logging.info('sniffing out walmart...')
+    rsp = default_response
+    return rsp
+    # with new_driver() as driver:
+    #     url = 'https://www.walmart.com/ip/Sony-PlayStation-5-Video-Game-Console/165545420'
+    #     driver.get(url)
+    #
+    # return rsp
