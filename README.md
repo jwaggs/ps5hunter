@@ -57,22 +57,22 @@ gcloud run deploy hunter \
     --min-instances=0 \
     --max-instances=4 \
     --memory 1G \
+    --timeout=1m59s \
     --set-env-vars SELENIUM_URL=$SELENIUM_URL \
     --set-env-vars TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
     --set-env-vars TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
     --set-env-vars TWILIO_PHONE_NUM=$TWILIO_PHONE_NUM \
     --set-env-vars SMS_NOTIFY_NUM=$SMS_NOTIFY_NUM
 
-# update image after pushing new one tagged with :latest
-gcloud run services update hunter \
-    --image us.gcr.io/ps5hunter/hunter
-
 
 ```
 
 ### Option 2 Kubernetes
 
-[scalable selenium on k8s](https://github.com/kubernetes/examples/tree/master/staging/selenium)
+# deploy selenium grid in k8s
 
+This [scalable selenium on k8s](https://github.com/kubernetes/examples/tree/master/staging/selenium) deployment example
+was cloned into the `./deployment` directory of this repo for reference, 
+and was used to deploy a grid to the ps5hunter cluster.
 
-
+# 

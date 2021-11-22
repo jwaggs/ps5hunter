@@ -83,11 +83,12 @@ def walmart():
     logging.info('sniffing out walmart...')
     rsp = default_response
     with new_driver() as driver:
-        url = 'https://www.walmart.com/ip/Sony-PlayStation-5-Video-Game-Console/165545420'
+        url = 'https://www.walmart.com/ip/PlayStation-5-Console/363472942?irgwc=1&sourceid=imp_wxw0K6wMnxyIT770gU38STG-UkG2yK3Rw2BP1o0&veh=aff&wmlspartner=imp_1943169&clickid=wxw0K6wMnxyIT770gU38STG-UkG2yK3Rw2BP1o0&sharedid=tomsguide-us&affiliates_ad_id=565706&campaign_id=9383'
         driver.get(url)
-        print('PAGE SOURCE', driver.page_source)
+        # TODO: remove pprint
+        from pprint import pprint
+        pprint(driver.page_source)
         if "Early access coming soon!" in driver.page_source:
-            print('FOUND MY STRING')
             rsp = 'Sold Out'
         else:
             rsp = 'IN STOCK'

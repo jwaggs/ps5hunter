@@ -28,11 +28,6 @@ else:
 
 @contextmanager
 def new_driver():
-    global selenium_url
-    if os.environ.get('SELENIUM_OVERRIDE') is not None:
-        selenium_url = os.environ.get('SELENIUM_OVERRIDE')
-        logging.warning(f'WARNING: OVERWROTE SELENIUM URL to {selenium_url}')
-
     selenium_connection = remote_connection.RemoteConnection(selenium_url, keep_alive=True)
     chrome_driver = webdriver.Remote(selenium_connection, DesiredCapabilities.CHROME)
     chrome_driver.set_page_load_timeout(120)

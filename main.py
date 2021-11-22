@@ -6,7 +6,6 @@ from flask import jsonify
 from core.hunter import best_buy, target, walmart
 from core.timer import RepeatedTimer
 from core.notify import notify
-import core.logger
 
 
 app = Flask(__name__)
