@@ -24,9 +24,9 @@ def notify(message: str):
 
 
 def notify_in_stock(name: str):
-    notify(f'ps5 IN STOCK @ {name}!')
+    notify(f'IN STOCK @ {name}!')
 
 
 def notify_of_error(error: str):
     logging.error(f'notifying of error: {error}')
-    notify(f'error checking ps5 stock: {error}')
+    notify(f'error checking stock: {error}')

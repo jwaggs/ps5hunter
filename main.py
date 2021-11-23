@@ -1,7 +1,7 @@
 import logging
 import time
 from flask import Flask
-from core.hunter import best_buy, target, walmart, gamestop, sony
+from core.hunter import best_buy, target, walmart, gamestop, sony_ps4
 from core.notify import notify
 
 
@@ -48,10 +48,10 @@ def hunt_forever():
 def check_all():
     response = {}  # json dict of store statuses
     # response['Walmart'] = walmart()  # damnit - walmart has recaptcha blocking me
+    response['GameStop'] = gamestop()
     response['BestBuy'] = best_buy()
     response['Target'] = target()
-    response['Sony'] = sony()
-    response['GameStop'] = gamestop()
+    response['Sony-ps4-1TB'] = sony_ps4()
     logging.info(f'inventory status: {response}')
 
     # TODO: remove pprint & notify here. only log each loop.
