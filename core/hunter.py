@@ -9,9 +9,9 @@ default_response = 'UNKNOWN'
 
 def retry_or_notify(retries=2):
     """
-    used to wrap a function and retry it n number of times, or notify_of_error once all retries are exhausted
+    used to wrap a function and retry it n number of times, or notify_of_error once all retries are exhausted.
     """
-    def decorator(f):
+    def decorator(func):
         def inner(*args, **kwargs):
             status = {
                 'retries': retries,  # num allowed retries
@@ -19,15 +19,13 @@ def retry_or_notify(retries=2):
             }
             while status['retries'] >= 0:
                 try:
-                    return f(*args, **kwargs)
+                    return func(*args, **kwargs)
                 except Exception as e:
                     logging.error(f'caught error in retry decorator: {e} retries-remaining: {status["retries"]}')
                     status['retries'] -= 1
                     status['errors'] += 1
             num_err = status['errors']
             notify_of_error(f'retried {retries} times, errored {num_err} times')
-            # return 'Status Unknown - All Retries Exhausted'
-            # raise Exception("retried {} times".format(retries))
         return inner
     return decorator
 
@@ -53,7 +51,6 @@ def best_buy():
         else:
             rsp = 'IN STOCK'
             notify_in_stock(f'best buy {url}')
-
     print(f'Best Buy: {rsp}')
     logging.info(f'Best Buy: {rsp}')
     return rsp
@@ -61,6 +58,9 @@ def best_buy():
 
 @retry_or_notify(retries=2)
 def target():
+    """
+    checks target site for ps5 inventory
+    """
     logging.info('sniffing out target...')
     rsp = default_response
     with new_driver() as driver:
@@ -80,6 +80,10 @@ def target():
 
 @retry_or_notify(retries=2)
 def walmart():
+    """
+    checks walmart site for ps5 inventory
+    note: walmart has bot detection... needs recaptcha handling.
+    """
     logging.info('sniffing out walmart...')
     rsp = default_response
     with new_driver() as driver:
@@ -95,4 +99,32 @@ def walmart():
             notify_in_stock(f'walmart {url}')
     print(f'Walmart: {rsp}')
     logging.info(f'Walmart: {rsp}')
+    return rsp
+
+
+def sony():
+    """
+    checks sony site for ps5 inventory
+    """
+    logging.info('sniffing out sony...')
+    rsp = default_response
+    with new_driver() as driver:
+        pass
+
+    print(f'Sony: {rsp}')
+    logging.info(f'Sony: {rsp}')
+    return rsp
+
+
+def gamestop():
+    """
+    checks gamestop site for ps5 inventory
+    """
+    logging.info('sniffing out gamestop...')
+    rsp = default_response
+    with new_driver() as driver:
+        pass
+
+    print(f'GameStop: {rsp}')
+    logging.info(f'GameStop: {rsp}')
     return rsp

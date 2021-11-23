@@ -3,16 +3,11 @@ import google.cloud.logging
 import os
 
 
-# Retrieves a Cloud Logging handler based on the environment
-# you're running in and integrates the handler with the
-# Python logging module. By default this captures all logs
-# at INFO level and higher
 # TODO: better mechanism for swapping out logger.
 if not os.getenv('DISABLE_CLOUD_LOGGER', False):
+    # check if cloud logging is disabled ( so local sessions can run without cloud logging credentials )
     client = google.cloud.logging.Client()
-    client.setup_logging()
+    client.setup_logging()  # by default this captures info and higher
 
 # logger = client.logger('default')
 # logger.setLevel('INFO')
-
-# logging.basicConfig(level=logging.INFO)

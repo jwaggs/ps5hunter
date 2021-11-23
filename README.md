@@ -61,7 +61,7 @@ gcloud run deploy hunter \
     --set-env-vars SELENIUM_URL=$SELENIUM_URL \
     --set-env-vars TWILIO_ACCOUNT_SID=$TWILIO_ACCOUNT_SID \
     --set-env-vars TWILIO_AUTH_TOKEN=$TWILIO_AUTH_TOKEN \
-    --set-env-vars TWILIO_PHONE_NUM=$TWILIO_PHONE_NUM \
+    --set-env-vars TWILIO_FROM_NUM=$TWILIO_FROM_NUM \
     --set-env-vars SMS_NOTIFY_NUM=$SMS_NOTIFY_NUM
 
 

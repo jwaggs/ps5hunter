@@ -4,13 +4,17 @@ from twilio.rest import Client
 
 
 account_sid = os.getenv('TWILIO_ACCOUNT_SID')
-assert account_sid is not None
+if not account_sid:
+    raise Exception('TWILIO_ACCOUNT_SID env var required')
 auth_token = os.getenv('TWILIO_AUTH_TOKEN')
-assert auth_token is not None
+if not auth_token:
+    raise Exception('TWILIO_AUTH_TOKEN env var required')
 number_from = os.getenv('TWILIO_PHONE_NUM')
-assert number_from is not None
+if not number_from:
+    raise Exception('TWILIO_FROM_NUM env var required')
 number_to = os.getenv('SMS_NOTIFY_NUM')
-assert number_to is not None
+if not number_to:
+    raise Exception('SMS_NOTIFY_NUM env var required')
 
 
 def notify(message: str):

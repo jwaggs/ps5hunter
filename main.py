@@ -1,10 +1,7 @@
-import datetime
 import logging
 import time
 from flask import Flask
-from flask import jsonify
-from core.hunter import best_buy, target, walmart
-from core.timer import RepeatedTimer
+from core.hunter import best_buy, target, walmart, gamestop, sony
 from core.notify import notify
 
 
@@ -51,9 +48,11 @@ def hunt_forever():
 def check_all():
     response = {}  # json dict of store statuses
     # response['Walmart'] = walmart()  # damnit - walmart has recaptcha blocking me
-    response['Best Buy'] = best_buy()
+    response['BestBuy'] = best_buy()
     response['Target'] = target()
-    logging.info(f'checked all stores: {response}')
+    response['Sony'] = sony()
+    response['GameStop'] = gamestop()
+    logging.info(f'inventory status: {response}')
 
     # TODO: remove pprint & notify here. only log each loop.
     # from pprint import pprint

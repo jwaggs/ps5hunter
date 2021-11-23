@@ -14,20 +14,12 @@ else:
     raise Exception('No remote Selenium webdriver provided in the environment.')
 
 
-# def new_remote_driver():
-#     global selenium_url
-#     if os.environ.get('SELENIUM_OVERRIDE') is not None:
-#         selenium_url = os.environ.get('SELENIUM_OVERRIDE')
-#         logging.warning(f'WARNING: OVERWROTE SELENIUM URL to {selenium_url}')
-#
-#     selenium_connection = remote_connection.RemoteConnection(selenium_url, keep_alive=True)
-#     chrome_driver = webdriver.Remote(selenium_connection, DesiredCapabilities.CHROME)
-#     chrome_driver.set_page_load_timeout(120)
-#     return chrome_driver
-
-
 @contextmanager
 def new_driver():
+    """
+    driver generator.
+    yields a driver, and ensures the chrome_driver.quit() method is called before re-raising the error
+    """
     selenium_connection = remote_connection.RemoteConnection(selenium_url, keep_alive=True)
     chrome_driver = webdriver.Remote(selenium_connection, DesiredCapabilities.CHROME)
     chrome_driver.set_page_load_timeout(120)
