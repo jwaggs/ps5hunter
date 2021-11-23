@@ -11,7 +11,7 @@ def retry_or_notify(retries=2):
     """
     used to wrap a function and retry it n number of times, or notify_of_error once all retries are exhausted.
     """
-    def decorator(func):
+    def decorator(f):
         def inner(*args, **kwargs):
             status = {
                 'retries': retries,  # num allowed retries
@@ -19,7 +19,7 @@ def retry_or_notify(retries=2):
             }
             while status['retries'] >= 0:
                 try:
-                    return func(*args, **kwargs)
+                    return f(*args, **kwargs)
                 except Exception as e:
                     logging.error(f'caught error in retry decorator: {e} retries-remaining: {status["retries"]}')
                     status['retries'] -= 1
@@ -102,6 +102,7 @@ def walmart():
     return rsp
 
 
+@retry_or_notify(retries=2)
 def sony():
     """
     checks sony site for ps5 inventory
@@ -116,6 +117,7 @@ def sony():
     return rsp
 
 
+@retry_or_notify(retries=2)
 def gamestop():
     """
     checks gamestop site for ps5 inventory

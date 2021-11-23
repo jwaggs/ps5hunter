@@ -61,18 +61,6 @@ def check_all():
     return response
 
 
-# def delete_me_infinite_text_loop():
-#     tick = 0
-#     while True:
-#         if tick % 5 == 0:
-#             notify('delete_me_infinite_text_loop!!!')
-#         print(f'tick {tick}')
-#         time.sleep(2)
-#         print(f'boom!')
-#         time.sleep(1)
-#         tick += 1
-
-
 if __name__ == '__main__':
     notify('ps5hunter started')
     hunt_forever()

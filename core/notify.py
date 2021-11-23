@@ -9,7 +9,7 @@ if not account_sid:
 auth_token = os.getenv('TWILIO_AUTH_TOKEN')
 if not auth_token:
     raise Exception('TWILIO_AUTH_TOKEN env var required')
-number_from = os.getenv('TWILIO_PHONE_NUM')
+number_from = os.getenv('TWILIO_FROM_NUM')
 if not number_from:
     raise Exception('TWILIO_FROM_NUM env var required')
 number_to = os.getenv('SMS_NOTIFY_NUM')
