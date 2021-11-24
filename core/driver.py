@@ -9,7 +9,7 @@ from contextlib import contextmanager
 selenium_url = None
 if os.environ.get('SELENIUM_URL') is not None:
     selenium_url = os.environ.get('SELENIUM_URL')  # required env
-    logging.info(f'selenium url: {selenium_url}')
+    logging.info(f'SELENIUM_URL: {selenium_url}')
 else:
     raise Exception('No remote Selenium webdriver provided in the environment.')
 

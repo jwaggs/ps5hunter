@@ -1,5 +1,7 @@
 .DS_Store
 .idea
+# ignore our output screenshots directory
+/screenshots/
 
 
 # Byte-compiled / optimized / DLL files

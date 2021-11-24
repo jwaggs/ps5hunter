@@ -4,15 +4,28 @@ My son wants a PlayStation 5 for Christmas, and frankly so do I.
 They sell out within an hour of coming back into stock at any store.
 This is a quick and dirty bot to hunt down a ps5 - not professional work.
 
-# Commands to get going
+## Quickstart
+
+Run a standalone selenium chrome container.
+
+`docker run -d -p 4444:4444 -v /dev/shm:/dev/shm selenium/standalone-chrome`
+
+Build the hunter container.
 
 `docker build -t us.gcr.io/ps5hunter/hunter:latest .`
 
-`docker run --env TWILIO_ACCOUNT_SID --env TWILIO_AUTH_TOKEN --env TWILIO_PHONE_NUM --env SMS_NOTIFY_NUM us.gcr.io/ps5hunter/hunter:latest`
+Run the hunter.
+
+`docker run --env SELENIUM_URL --env TWILIO_ACCOUNT_SID --env TWILIO_AUTH_TOKEN --env TWILIO_PHONE_NUM --env SMS_NOTIFY_NUM us.gcr.io/ps5hunter/hunter:latest`
 
 
-### Option 1 Google Cloud Run
+## Deployed Bot Option 1 - Google Cloud Run
 
+Create a fresh Google Cloud Project.
+
+Download and authenticate gcloud cli, and set the default project of the cli to the newly created project.
+
+Run the following commands, substituting your own project name (mine is ps5hunter).
 ```
 ### Selenium Browser Deployment
 
@@ -67,12 +80,14 @@ gcloud run deploy hunter \
 
 ```
 
-### Option 2 Kubernetes
+## Deployed Bot Option 2 - Kubernetes
 
-# deploy selenium grid in k8s
+### Deploy selenium grid in k8s
 
 This [scalable selenium on k8s](https://github.com/kubernetes/examples/tree/master/staging/selenium) deployment example
 was cloned into the `./deployment` directory of this repo for reference, 
-and was used to deploy a grid to the ps5hunter cluster.
+and was used to deploy a grid to the ps5hunter GKE k8s cluster.
 
-# 
+### Deploy hunter in k8s
+
+

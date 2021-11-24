@@ -1,8 +1,9 @@
 import logging
 import time
 from flask import Flask
-from core.hunter import best_buy, target, walmart, gamestop, sony_ps4
-from core.notify import notify
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from core import hunt
+from core.notify import notify, notify_of_error
 
 
 app = Flask(__name__)
@@ -20,8 +21,11 @@ def index():
     return response
 
 
-# this is no longer used because i deployed to GCP Cloud Run which does not handle long running jobs.
 def hunt_forever():
+    """
+    An infinite loop to check all sources once a minute. Used for local testing.
+    The deployed bot lets the scheduler invoke this api, and loop is not used.
+    """
     notify('hunting forever...')
     # run our scrapers on a repeated loop
     # RepeatedTimer(15, best_buy)
@@ -46,18 +50,33 @@ def hunt_forever():
 
 
 def check_all():
-    response = {}  # json dict of store statuses
-    # response['Walmart'] = walmart()  # damnit - walmart has recaptcha blocking me
-    response['GameStop'] = gamestop()
-    response['BestBuy'] = best_buy()
-    response['Target'] = target()
-    response['Sony-ps4-1TB'] = sony_ps4()
-    logging.info(f'inventory status: {response}')
+    start = time.time()
+    response = {}
+    with ThreadPoolExecutor(max_workers=10) as e:
+        futures = [
+            e.submit(hunt.amazon),
+            e.submit(hunt.best_buy),
+            e.submit(hunt.costco),
+            e.submit(hunt.gamestop),
+            e.submit(hunt.target),
+            e.submit(hunt.sony_ps4),
+            e.submit(hunt.sony_ps5_disc),
+            e.submit(hunt.sony_ps5_digital),
+            e.submit(hunt.adorama),
+        ]
 
-    # TODO: remove pprint & notify here. only log each loop.
-    # from pprint import pprint
-    # pprint(response)
-    # notify(f'statuses:\n\n{response}')
+        response['results'] = []
+        for future in as_completed(futures):
+            try:
+                result = future.result()
+                response['results'].append(result)
+            except Exception as exc:
+                notify_of_error(f'error getting result of future {exc}')
+
+    end = time.time()
+    duration = end - start
+    logging.info(f'runloop took {duration} seconds')
+    logging.info(f'inventory status: {response}')
     return response
 
 
