@@ -2,7 +2,10 @@ import logging
 import os
 from datetime import datetime
 from google.cloud import storage
-from core.hunt import BUCKET_NAME, SCREENSHOT_DIR
+
+
+BUCKET_NAME = 'ps5hunter-screenshots'
+SCREENSHOT_DIR = 'screenshots'
 
 
 def upload_driver_screenshot(driver, name):

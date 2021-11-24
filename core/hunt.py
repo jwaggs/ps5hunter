@@ -2,12 +2,9 @@ import logging
 from selenium.webdriver.common.by import By
 from core.driver import new_driver
 from core.notify import notify_in_stock, notify_of_error
-
 from core.screenshot import upload_driver_screenshot
 
 DEFAULT_RESPONSE = 'UNKNOWN'
-BUCKET_NAME = 'ps5hunter-screenshots'
-SCREENSHOT_DIR = 'screenshots'
 
 
 def retry_or_notify(retries=2):
