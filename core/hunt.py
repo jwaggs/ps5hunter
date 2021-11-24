@@ -1,12 +1,9 @@
-import os
 import logging
-from datetime import datetime
 from selenium.webdriver.common.by import By
-from google.cloud import storage
 from core.driver import new_driver
-from core.notify import notify_in_stock, notify_of_error, notify
-from pprint import pprint
+from core.notify import notify_in_stock, notify_of_error
 
+from core.screenshot import upload_driver_screenshot
 
 DEFAULT_RESPONSE = 'UNKNOWN'
 BUCKET_NAME = 'ps5hunter-screenshots'
@@ -37,22 +34,6 @@ def retry_or_notify(retries=2):
     return decorator
 
 
-def upload_driver_screenshot(driver, name):
-    """
-    logic to save a driver screenshot and upload it to cloud storage
-    """
-    fname = f'{name}-{datetime.now().isoformat()}.png'
-    logging.info(f'saving screenshot {fname}')
-
-    client = storage.Client()
-    bucket = client.get_bucket(BUCKET_NAME)
-    os.makedirs(SCREENSHOT_DIR, exist_ok=True)
-    fpath = os.path.join(SCREENSHOT_DIR, fname)
-    driver.save_screenshot(fpath)
-    new_blob = bucket.blob(fname)
-    new_blob.upload_from_filename(filename=fpath)
-
-
 @retry_or_notify(retries=2)
 def amazon():
     """
@@ -63,15 +44,13 @@ def amazon():
     with new_driver() as driver:
         url = 'https://www.amazon.com/PlayStation-5-Console/dp/B08FC5L3RG/ref=as_li_ss_tl'
         driver.get(url)
-
-        upload_driver_screenshot(driver, 'amazon')
-
         price_element = driver.find_element(By.CSS_SELECTOR, 'span.a-color-price')
         if price_element.text == 'Currently unavailable.':
             rsp = 'Sold Out'
         else:
             rsp = f'ps5 IN STOCK @ Amazon - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'amazon')
     print(f'Amazon: {rsp}')
     logging.info(f'Amazon: {rsp}')
     return rsp
@@ -98,6 +77,7 @@ def best_buy():
         else:
             rsp = f'ps5 IN STOCK @ Best Buy - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'best_buy')
     print(f'Best Buy: {rsp}')
     logging.info(f'Best Buy: {rsp}')
     return rsp
@@ -119,6 +99,7 @@ def costco():
         else:
             rsp = f'ps5 IN STOCK @ Costco - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'costco')
     print(f'Costco: {rsp}')
     logging.info(f'Costco: {rsp}')
     return rsp
@@ -140,6 +121,7 @@ def gamestop():
         else:
             rsp = f'ps5 IN STOCK @ GameStop - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'gamestop')
 
     print(f'GameStop: {rsp}')
     logging.info(f'GameStop: {rsp}')
@@ -163,6 +145,7 @@ def target():
         else:
             rsp = f'ps5 IN STOCK @ Target - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'target')
     print(f'Target: {rsp}')
     logging.info(f'Target: {rsp}')
     return rsp
@@ -185,6 +168,7 @@ def sony_ps5_disc():
         else:
             rsp = f'ps5 Disc IN STOCK @ sony - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'sony_ps5_disc')
     print(f'Sony: {rsp}')
     logging.info(f'Sony: {rsp}')
     return rsp
@@ -207,7 +191,7 @@ def sony_ps5_digital():
         else:
             rsp = f'ps5 Digital IN STOCK @ sony - {url}'
             notify_in_stock(rsp)
-
+            upload_driver_screenshot(driver, 'sony_ps5_digital')
     print(f'Sony: {rsp}')
     logging.info(f'Sony: {rsp}')
     return rsp
@@ -230,6 +214,7 @@ def sony_ps4():
         else:
             rsp = f'ps4 1TB IN STOCK @ sony - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'sony_ps4')
 
     print(f'Sony: {rsp}')
     logging.info(f'Sony: {rsp}')
@@ -252,6 +237,8 @@ def adorama():
         else:
             rsp = f'ps5 IN STOCK @ Adorama - {url}'
             notify_in_stock(rsp)
+            upload_driver_screenshot(driver, 'adorama')
+
     print(f'Adorama: {rsp}')
     logging.info(f'Adorama: {rsp}')
     return rsp
@@ -280,6 +267,7 @@ def walmart():
     #     else:
     #         rsp = f'ps5 IN STOCK @ walmart - {url}'
     #         notify_in_stock(rsp)
+    #         upload_driver_screenshot(driver, 'adorama')
     # print(f'Walmart: {rsp}')
     # logging.info(f'Walmart: {rsp}')
     # return rsp
