@@ -6,7 +6,7 @@ from core.notify import notify_in_stock, notify_of_error
 from core.screenshot import upload_driver_screenshot
 
 
-class HuntStatus(Enum):
+class HuntStatus(str, Enum):
     UNKNOWN = 'UNKNOWN'
     ERROR = 'ERROR'
     SOLD_OUT = 'SOLD_OUT'
@@ -18,13 +18,13 @@ def hunter(url: str, retries: int = 1):
     wrapper for selenium web driver based hunts.
     injects a selenium web driver into the decorated function.
     if an error is raised inside the decorated function, this wrapper will retry the decorated function.
-    if all retries are exhausted due to errors, this function will invoke notify_of_error.
+    if all retries are exhausted, this function will invoke notify_of_error.
     if the decorated function result is IN_STOCK, this function will invoke notify_in_stock.
     """
     if not url or url == '':
         raise ValueError('url is required for hunter decorator.')
     if retries < 0:
-        raise ValueError('retry count cannot be negative. set to zero instead.')
+        raise ValueError('retries cannot be negative. set to zero instead.')
 
     def decorator(f):
         def inner(*args, **kwargs):
@@ -35,7 +35,6 @@ def hunter(url: str, retries: int = 1):
                 'screenshot': None,  # if one is captured, this should be set with the url after upload.
                 'attempts': 0,  # num times attempted.
                 'errors': 0,  # num errors.
-                'error': None,
             }
 
             allowed_attempts = 1 + retries  # we try 1 time plus the number of allowed retries.
@@ -46,25 +45,25 @@ def hunter(url: str, retries: int = 1):
                     try:
                         # load page
                         driver.get(payload['url'])
-
-                        # the decorated function can set response content on payload. this decorator will return it.
+                        # invoke the decorated function, injecting the driver and payload we manage here.
                         f(driver=driver, payload=payload, *args, **kwargs)
-
-                        if payload['status'] is HuntStatus.IN_STOCK:
-                            screenshot_url = upload_driver_screenshot(driver, payload['name'])
-                            if screenshot_url:
-                                payload['screenshot'] = screenshot_url
-                            notify_in_stock(payload)
-
+                        # if an exception wasn't raised, we are done here. return the payload as the response.
                         logging.info(f'hunt finished @ {payload}')
                         return payload
                     except Exception as e:
-                        logging.error(f'caught error in {f.__name__}: {e} retries-remaining: {payload["retries"]}')
+                        logging.error(f'caught error in {f.__name__}: {e} - {payload}')
                         payload['status'] = HuntStatus.ERROR
                         payload['errors'] += 1
-                        payload['error'] = e
                     finally:
-                        if payload['status'] is HuntStatus.ERROR and payload['errors'] == allowed_attempts:
+                        if payload['status'] is HuntStatus.IN_STOCK:
+                            # item is in stock - notify before screenshot for speed.
+                            notify_in_stock(payload)
+                            screenshot_url = upload_driver_screenshot(driver, payload['name'])
+                            if screenshot_url:
+                                payload['screenshot'] = screenshot_url
+
+                        if payload['errors'] == allowed_attempts:
+                            # all attempts errored - take screenshot and notify
                             screenshot_url = upload_driver_screenshot(driver, payload['name'])
                             if screenshot_url:
                                 payload['screenshot'] = screenshot_url
@@ -81,6 +80,10 @@ def amazon(driver, payload):
     """
     checks amazon site for ps5 inventory
     """
+    # TODO: fix this:
+    # payload['status'] = HuntStatus.IN_STOCK
+    # return
+
     # price_element = WebDriverWait(driver, 15).until(lambda d: d.find_element(By.CSS_SELECTOR, 'span.a-color-price'))
     price_element = driver.find_element(By.CSS_SELECTOR, 'span.a-color-price')
     if price_element.text == 'Currently unavailable.':
@@ -94,6 +97,9 @@ def best_buy(driver, payload):
     """
     checks best buy site for ps5 inventory
     """
+    # TODO: fix this:
+    # raise Exception('TODO: REMOVE THIS EXCEPTION')
+
     buy_button = driver.find_element(By.CSS_SELECTOR, 'button.add-to-cart-button')
     if buy_button.text == 'Coming Soon' or buy_button.text == 'Sold Out':
         payload['status'] = HuntStatus.SOLD_OUT
@@ -202,5 +208,4 @@ def adorama(driver, payload):
 #     checks walmart site for ps5 inventory
 #     """
 #     # TODO: add recaptcha handling.
-#     # unfortunately walmart has bot detection. I may try to solve this at some point. for now walmart is not supported
 #     pass

@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: hunter
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: hunter
@@ -12,6 +12,7 @@ spec:
       labels:
         app: hunter
     spec:
+      serviceAccountName: hunter-k8s-sa
       containers:
       - name: hunter
         image: us.gcr.io/ps5hunter/hunter:latest

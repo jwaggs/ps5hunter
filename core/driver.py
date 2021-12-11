@@ -32,15 +32,14 @@ def new_driver():
     selenium_connection = remote_connection.RemoteConnection(selenium_url, keep_alive=True)
     chrome_driver = webdriver.Remote(selenium_connection, DesiredCapabilities.CHROME)
     chrome_driver.set_page_load_timeout(120)
-    error = None
+    chrome_driver.set_window_size(1200, 1700)
+
     try:
         yield chrome_driver
     except Exception as e:
-        error = e
+        logging.error(f'caught error in driver context manager: {e}')
     finally:
         chrome_driver.quit()  # quit the driver or future calls will hang
-        if error:
-            raise error
 
 
 @contextmanager
@@ -51,15 +50,11 @@ def new_local_driver():
     """
     chrome_driver = webdriver.Chrome(executable_path=selenium_url)
     chrome_driver.set_page_load_timeout(120)
-    # chrome_driver.set_window_position(0, 0)
     chrome_driver.set_window_size(1200, 1700)
-    error = None
+
     try:
         yield chrome_driver
     except Exception as e:
         print('EXCEPTION CAUGHT IN DRIVER MANAGER', e)
-        error = e
     finally:
         chrome_driver.quit()  # quit the driver or future calls will hang
-        if error:
-            raise error

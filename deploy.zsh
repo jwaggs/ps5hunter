@@ -22,10 +22,10 @@ kubectl create configmap hunter-config \
     --from-literal=SELENIUM_URL="$SELENIUM_URL"
 
 # create hunter deployment
-kubectl apply -f deployment/hunter/hunter.yaml
+kubectl apply -f deploy/hunter/hunter-deployment.yaml
 
 # expose hunter deployment externally with a load-balancer
 kubectl expose deployment hunter --name=hunter-external --labels="app=hunter,external=true" --type=LoadBalancer
 
 # create internal service
-# kubectl apply -f deployment/hunter/hunter-svc.yaml
+# kubectl apply -f deploy/hunter/hunter-svc.yaml

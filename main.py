@@ -6,7 +6,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from core import hunt
 from core.notify import notify
 
-
 app = Flask(__name__)
 
 runloop_interval = 60  # for now, limit runloops to once every 60 seconds.
@@ -16,9 +15,7 @@ LAST_HUNT = None  # keeps track of the last hunt result so that status route can
 
 @app.route("/")
 def index():
-    return {
-        'status': LAST_HUNT,
-    }
+    return LAST_HUNT
 
 
 @app.route("/hunter")
@@ -62,12 +59,12 @@ def hunt_forever():
 
 def check_all():
     start = time.time()
-    response = {}
+    results = []
 
     # async execution - this will choke without a selenium-grid capable of handling concurrent traffic.
     with ThreadPoolExecutor(max_workers=10) as e:
         futures = [
-            e.submit(hunt.amazon),  # amazon may have blocked me...
+            e.submit(hunt.amazon),
             e.submit(hunt.best_buy),
             e.submit(hunt.costco),
             e.submit(hunt.gamestop),
@@ -78,22 +75,19 @@ def check_all():
             e.submit(hunt.adorama),
         ]
 
-        response['results'] = []
         for future in as_completed(futures):
             try:
-                result = future.result()
-                response['results'].append(result)
-            except Exception as exc:
-                logging.error('caught error handling thread pool futures')
+                results.append(future.result())
+            except Exception as e:
+                logging.error('caught error handling thread pool futures', e)
 
     end = time.time()
-    duration = end - start
-    logging.info(f'runloop took {duration} seconds')
-    logging.info(f'inventory status: {response}')
-    return response
+    logging.debug(f'runloop took {end - start} seconds. status: {results}')
+    return {'results': results}
 
 
 if __name__ == '__main__':
     notify('ps5hunter main started')
+    # TODO: remove hunt_forever loop
     # hunt_forever()
     app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

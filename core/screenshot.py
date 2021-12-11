@@ -20,12 +20,14 @@ def upload_driver_screenshot(driver, name, is_errored=False):
         os.makedirs(SCREENSHOT_DIR, exist_ok=True)
         fpath = os.path.join(SCREENSHOT_DIR, fname)
         driver.save_screenshot(fpath)
+        logging.info(f'saved screenshot {fpath}')
 
         # upload screenshot
         client = storage.Client()
         bucket = client.get_bucket(BUCKET_NAME)
         new_blob = bucket.blob(fname)
         new_blob.upload_from_filename(filename=fpath)
+        logging.info(f'uploaded screenshot {fpath}')
         return fpath
     except Exception as e:
         logging.error(f'caught error handling screenshot: {e}')
