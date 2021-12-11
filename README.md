@@ -4,6 +4,7 @@ My son wants a PlayStation 5 for Christmas, and frankly so do I.
 They sell out within an hour of coming back into stock at any store.
 This is a quick and dirty bot to hunt down a ps5 - not professional work.
 
+
 ## Quickstart
 
 Run a standalone selenium chrome container.

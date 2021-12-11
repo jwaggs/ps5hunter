@@ -17,16 +17,25 @@ if not number_to:
     raise Exception('SMS_NOTIFY_NUM env var required')
 
 
-def notify(message: str):
+def notify(message: str, media_url: str = None):
     client = Client(account_sid, auth_token)
-    message = client.messages.create(to=number_to, from_=number_from, body=message)
-    logging.info(f'sent message: {message} sid: {message.sid}')
+    message = client.messages.create(to=number_to, from_=number_from, body=message, media_url=[media_url])
+    logging.debug(f'sent message: {message} sid: {message.sid}')
 
 
-def notify_in_stock(name: str):
-    notify(f'IN STOCK @ {name}!')
+def notify_in_stock(payload):
+    logging.info(f'notifying IN STOCK: {payload}')
+    notify(f'IN STOCK @ {payload["name"]}')
+    notify(f'{payload["url"]}')
+    screenshot = payload.get('screenshot', None)
+    if screenshot:
+        notify(f'{screenshot}')
 
 
-def notify_of_error(error: str):
-    logging.error(f'notifying of error: {error}')
-    notify(f'error checking stock: {error}')
+def notify_of_error(payload):
+    logging.error(f'notifying of error: {payload}')
+    notify(f'ERROR @ {payload["name"]}')
+    notify(f'{payload["url"]}')
+    screenshot = payload.get('screenshot', None)
+    if screenshot:
+        notify(f'{screenshot}')

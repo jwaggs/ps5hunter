@@ -1,23 +1,35 @@
+import os
 import logging
 import time
 from flask import Flask
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from core import hunt
-from core.notify import notify, notify_of_error
+from core.notify import notify
 
 
 app = Flask(__name__)
 
 runloop_interval = 60  # for now, limit runloops to once every 60 seconds.
 
+LAST_HUNT = None  # keeps track of the last hunt result so that status route can give a quick report of latest info.
+
 
 @app.route("/")
 def index():
+    return {
+        'status': LAST_HUNT,
+    }
+
+
+@app.route("/hunter")
+def hunter():
     """
     the only route - hunts all tracked sites for inventory
     :return: json dict of statuses
     """
     response = check_all()
+    global LAST_HUNT
+    LAST_HUNT = response
     return response
 
 
@@ -28,7 +40,6 @@ def hunt_forever():
     """
     notify('hunting forever...')
     # run our scrapers on a repeated loop
-    # RepeatedTimer(15, best_buy)
     tick = 0
     while tick >= 0:
         tick += 1
@@ -52,16 +63,18 @@ def hunt_forever():
 def check_all():
     start = time.time()
     response = {}
+
+    # async execution - this will choke without a selenium-grid capable of handling concurrent traffic.
     with ThreadPoolExecutor(max_workers=10) as e:
         futures = [
-            e.submit(hunt.amazon),
+            e.submit(hunt.amazon),  # amazon may have blocked me...
             e.submit(hunt.best_buy),
             e.submit(hunt.costco),
             e.submit(hunt.gamestop),
-            e.submit(hunt.target),
             e.submit(hunt.sony_ps4),
             e.submit(hunt.sony_ps5_disc),
             e.submit(hunt.sony_ps5_digital),
+            e.submit(hunt.target),
             e.submit(hunt.adorama),
         ]
 
@@ -71,7 +84,7 @@ def check_all():
                 result = future.result()
                 response['results'].append(result)
             except Exception as exc:
-                notify_of_error(f'error getting result of future {exc}')
+                logging.error('caught error handling thread pool futures')
 
     end = time.time()
     duration = end - start
@@ -81,6 +94,6 @@ def check_all():
 
 
 if __name__ == '__main__':
-    notify('ps5hunter started')
-    hunt_forever()
-    # app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))
+    notify('ps5hunter main started')
+    # hunt_forever()
+    app.run(debug=False, host="0.0.0.0", port=int(os.environ.get("PORT", 8080)))

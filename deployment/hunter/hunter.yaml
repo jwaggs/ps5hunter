@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hunter
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: hunter
+  template:
+    metadata:
+      labels:
+        app: hunter
+    spec:
+      containers:
+      - name: hunter
+        image: us.gcr.io/ps5hunter/hunter:latest
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+          - name: hunter-config
+            mountPath: "/hunter/config"
+            readOnly: true
+        env:
+          - name: TWILIO_FROM_NUM
+            valueFrom:
+              configMapKeyRef:
+                name: hunter-config
+                key: TWILIO_FROM_NUM
+          - name: TWILIO_ACCOUNT_SID
+            valueFrom:
+              configMapKeyRef:
+                name: hunter-config
+                key: TWILIO_ACCOUNT_SID
+          - name: TWILIO_AUTH_TOKEN
+            valueFrom:
+              configMapKeyRef:
+                name: hunter-config
+                key: TWILIO_AUTH_TOKEN
+          - name: SMS_NOTIFY_NUM
+            valueFrom:
+              configMapKeyRef:
+                name: hunter-config
+                key: SMS_NOTIFY_NUM
+          - name: SELENIUM_URL
+            valueFrom:
+              configMapKeyRef:
+                name: hunter-config
+                key: SELENIUM_URL
+      volumes:
+        - name: hunter-config
+          configMap:
+            name: hunter-config

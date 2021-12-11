@@ -2,6 +2,8 @@
 .idea
 # ignore our output screenshots directory
 /screenshots/
+# ignore my local copy of chromedriver
+/driver/chromedriver
 
 
 # Byte-compiled / optimized / DLL files
