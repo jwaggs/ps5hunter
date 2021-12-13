@@ -8,5 +8,5 @@ docker push us.gcr.io/ps5hunter/hunter:latest
 # apply deployment
 kubectl apply -f deploy/hunter/hunter-deployment.yaml
 
-# trigger fresh pods if the apply didn't
+# trigger fresh pods in case the apply didn't automatically do so
 kubectl rollout restart deployment hunter

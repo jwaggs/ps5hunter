@@ -64,7 +64,7 @@ def check_all():
     # async execution - this will choke without a selenium-grid capable of handling concurrent traffic.
     with ThreadPoolExecutor(max_workers=10) as e:
         futures = [
-            e.submit(hunt.amazon),
+            # e.submit(hunt.amazon),  # amazon has some sort of bot detection I think. only works for about 1 day.
             e.submit(hunt.best_buy),
             e.submit(hunt.costco),
             e.submit(hunt.gamestop),

@@ -30,4 +30,4 @@ def upload_driver_screenshot(driver, name, is_errored=False):
         logging.info(f'uploaded screenshot {fpath}')
         return fpath
     except Exception as e:
-        logging.error(f'caught error handling screenshot: {e}')
+        logging.error(f'suppressed error while handling screenshot: {e}')

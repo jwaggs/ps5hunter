@@ -5,7 +5,7 @@ import os
 import logging
 from contextlib import contextmanager
 
-# this flag will use a local chromedriver instead of
+# this flag will use a local chromedriver instead of a remote grid instance
 disable_cloud = os.environ.get('DISABLE_CLOUD', False)
 
 

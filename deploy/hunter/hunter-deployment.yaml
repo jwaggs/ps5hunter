@@ -25,24 +25,34 @@ spec:
         env:
           - name: TWILIO_FROM_NUM
             valueFrom:
-              configMapKeyRef:
-                name: hunter-config
+              secretKeyRef:
+                name: twilio
                 key: TWILIO_FROM_NUM
           - name: TWILIO_ACCOUNT_SID
             valueFrom:
-              configMapKeyRef:
-                name: hunter-config
+              secretKeyRef:
+                name: twilio
                 key: TWILIO_ACCOUNT_SID
           - name: TWILIO_AUTH_TOKEN
             valueFrom:
-              configMapKeyRef:
-                name: hunter-config
+              secretKeyRef:
+                name: twilio
                 key: TWILIO_AUTH_TOKEN
           - name: SMS_NOTIFY_NUM
             valueFrom:
-              configMapKeyRef:
-                name: hunter-config
+              secretKeyRef:
+                name: twilio
                 key: SMS_NOTIFY_NUM
+          - name: TWITTER_API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: twitter
+                key: TWITTER_API_KEY
+          - name: TWITTER_API_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: twitter
+                key: TWITTER_API_SECRET
           - name: SELENIUM_URL
             valueFrom:
               configMapKeyRef:
